@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quick Search</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 15px;
+            background: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        #search-container {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        #search-button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #results {
+            flex-grow: 1;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            padding: 10px;
+        }
+        .result-item {
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .result-item a {
+            color: #1a0dab;
+            text-decoration: none;
+        }
+        .result-item a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="search-container">
+        <input type="text" id="search-input" placeholder="Search Google">
+        <button id="search-button">Search</button>
+    </div>
+    <div id="results">
+        <!-- Search results will be displayed here -->
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const resultsContainer = document.getElementById('results');
+
+        // Search functionality
+        function performSearch() {
+            const query = searchInput.value.trim();
+            if (!query) return;
+
+            // Google search URL
+            const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            
+            // Clear previous results
+            resultsContainer.innerHTML = '<p>Searching...</p>';
+
+            // Simulate search results (replace with actual search API if needed)
+            fetch(`https://www.googleapis.com/customsearch/v1?key=AIzaSyCwY5kCvO1_oGEiaj_zLGFIrM07wTWBKbo&cx=66b2d40860d1a4ab1&q=${encodeURIComponent(query)}`)
+                .then(response => response.json())
+                .then(data => {
+                    resultsContainer.innerHTML = ''; // Clear loading
+                    
+                    if (data.items) {
+                        data.items.forEach(item => {
+                            const resultItem = document.createElement('div');
+                            resultItem.classList.add('result-item');
+                            resultItem.innerHTML = `
+                                <h3><a href="${item.link}" target="_blank">${item.title}</a></h3>
+                                <p>${item.snippet}</p>
+                            `;
+                            resultsContainer.appendChild(resultItem);
+                        });
+                    } else {
+                        resultsContainer.innerHTML = '<p>No results found</p>';
+                    }
+                })
+                .catch(error => {
+                    resultsContainer.innerHTML = `<p>Error: ${error.message}</p>`;
+                });
+        }
+
+        // Event listeners
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') performSearch();
+        });
+    </script>
+</body>
+</html>
